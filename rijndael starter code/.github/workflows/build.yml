@@ -1,0 +1,12 @@
+name: Build the project
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the repo
+        uses: actions/checkout@v4
+      - name: Build the code
+        run: |
+          sudo apt install -y build-essential python-is-python3
+          make
