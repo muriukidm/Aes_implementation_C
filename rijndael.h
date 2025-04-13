@@ -1,6 +1,7 @@
 /*
- * TODO: Add your name and student number here, along with
- *       a brief description of this code.
+ * TODO: Denis Muriuki D22127693,The Header file below is a AES-128
+ * implementation, which defines macros for block access and size, and function
+ * prototypes for encrypting and decrypting 16-byte blocks.
  */
 
 #ifndef RIJNDAEL_H
