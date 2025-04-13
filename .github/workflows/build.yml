@@ -6,7 +6,13 @@ jobs:
     steps:
       - name: Clone the repo
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Build the code
         run: |
           sudo apt install -y build-essential python-is-python3
           make
+      - name: Run tests
+        run: |
+          cd rijndael\ starter\ code
+          python3 unit_tests/test_rijndael.py
