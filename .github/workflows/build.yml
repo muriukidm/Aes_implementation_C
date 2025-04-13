@@ -8,6 +8,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Debug submodule
+        run: |
+          echo "Listing repository contents:"
+          ls -la
+          echo "Checking aes directory:"
+          ls -la aes || echo "aes directory not found"
+          echo "Checking aes/aes.py:"
+          ls -la aes/aes.py || echo "aes/aes.py not found"
+          echo "Submodule status:"
+          git submodule status
       - name: Build the code
         run: |
           sudo apt install -y build-essential python-is-python3
