@@ -1,6 +1,6 @@
 /*
- * Name: [Your Name]
- * Student Number: [Your Student Number]
+ * Name: [Denis Muriuki]
+ * Student Number: [D22127693]
  * Description: Implementation of AES-128 (Rijndael) block cipher in C,
  * providing encryption and decryption for 16-byte blocks using a 16-byte key.
  * Includes all AES operations (SubBytes, ShiftRows, MixColumns, AddRoundKey,
