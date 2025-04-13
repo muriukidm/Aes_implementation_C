@@ -14,5 +14,6 @@ jobs:
           make
       - name: Run tests
         run: |
-          cd rijndael\ starter\ code
+          cd "rijndael starter code"
           python3 unit_tests/test_rijndael.py
+          python3 unit_tests/test_encrypt_decrypt.py
