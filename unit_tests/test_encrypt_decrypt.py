@@ -3,6 +3,7 @@ import unittest  # Framework for writing and running unit tests
 import ctypes  # For interfacing with rijndael.dll (C implementation)
 import os  # For path manipulation and random byte generation
 import sys  # For modifying Python's module search path
+import platform  # For detecting the operating system
 
 # Ensure the aes submodule is accessible
 project_root = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -22,15 +23,16 @@ except ImportError as e:
 class TestEncryptDecrypt(unittest.TestCase):
     def setUp(self):
         # Initialize setup for all test methods
-        # Construct path to rijndael.dll
-        dll_path = os.path.join(project_root, 'rijndael.dll')
+        # Construct path to the shared library
+        lib_name = 'rijndael.dll' if platform.system() == 'Windows' else 'rijndael.so'
+        dll_path = os.path.join(project_root, lib_name)
         
-        # Load the rijndael.dll library
+        # Load the rijndael library
         try:
             self.lib = ctypes.cdll.LoadLibrary(dll_path)
         except Exception as e:
-            # Fail the test if the DLL cannot be loaded
-            self.fail(f"Failed to load rijndael.dll: {e}")
+            # Fail the test if the library cannot be loaded
+            self.fail(f"Failed to load {lib_name}: {e}")
 
         # Define the argument and return types for aes_encrypt_block
         # Takes two 16-byte arrays (plaintext, key), returns pointer to unsigned char
@@ -48,10 +50,17 @@ class TestEncryptDecrypt(unittest.TestCase):
         ]
         self.lib.aes_decrypt_block.restype = ctypes.POINTER(ctypes.c_ubyte)
 
-        # Access the C runtime's free function to clean up malloc'ed memory
-        self.c_free = ctypes.cdll.msvcrt.free
-        self.c_free.argtypes = [ctypes.c_void_p]
-        self.c_free.restype = None
+        # Access the platform-specific free function to clean up malloc'ed memory
+        try:
+            if platform.system() == 'Windows':
+                free_lib = ctypes.cdll.msvcrt
+            else:
+                free_lib = ctypes.CDLL('libc.so.6')
+            self.c_free = free_lib.free
+            self.c_free.argtypes = [ctypes.c_void_p]
+            self.c_free.restype = None
+        except Exception as e:
+            self.fail(f"Failed to load free function: {e}")
 
     def test_encrypt_decrypt_cycle(self):
         # Test the full encryption and decryption cycle with three random key/plaintext pairs
@@ -69,7 +78,7 @@ class TestEncryptDecrypt(unittest.TestCase):
             py_ciphertext = aes.encrypt_block(plaintext)
             print(f"Cycle {i+1} Python ciphertext: {py_ciphertext.hex()}")
             
-            # C implementation: encrypt using rijndael.dll
+            # C implementation: encrypt using rijndael library
             c_plaintext = (ctypes.c_ubyte * 16)(*plaintext)
             c_key = (ctypes.c_ubyte * 16)(*key)
             c_ciphertext_ptr = self.lib.aes_encrypt_block(c_plaintext, c_key)
@@ -88,7 +97,7 @@ class TestEncryptDecrypt(unittest.TestCase):
             py_decrypted = aes.decrypt_block(py_ciphertext)
             print(f"Cycle {i+1} Python decrypted: {py_decrypted.hex()}")
             
-            # C implementation: decrypt using rijndael.dll
+            # C implementation: decrypt using rijndael library
             c_ciphertext_array = (ctypes.c_ubyte * 16)(*py_ciphertext)
             c_decrypted_ptr = self.lib.aes_decrypt_block(c_ciphertext_array, c_key)
             if not c_decrypted_ptr:
