@@ -4,7 +4,7 @@ import os
 import sys
 from aes.aes import AES
 
-class TestRijndaelVsAES(unittest.TestCase):
+class TestRijndael(unittest.TestCase):
     def setUp(self):
         # Set up paths
         self.project_root = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
