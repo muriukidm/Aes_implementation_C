@@ -22,6 +22,8 @@ jobs:
         run: |
           sudo apt install -y build-essential python-is-python3
           make
+          echo "Listing built files:"
+          ls -la *.o *.so *.exe || echo "No build artifacts found"
       - name: Run tests
         run: |
           python3 unit_tests/test_rijndael.py
